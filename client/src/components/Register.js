@@ -1,20 +1,23 @@
 import React, { useState } from "react"
 import { Link } from "react-router-dom"
+import './Register.css';
 
 const Register = ({setAuth}) => {
     const [inputs, setInputs] = useState({
         first_name: "",
         last_name: "",
+        nickname: "",
         email: "",
-        password: ""
+        password: "",
+        active: true,
     })
 
-    const { first_name, last_name, email, password } = inputs
+    const { first_name, last_name, nickname, email, password } = inputs
 
     const onSubmitForm = async (e) => {
         e.preventDefault()
 
-        const body = { email, password, first_name, last_name }
+        const body = { email, password, nickname, first_name, last_name }
 
         try {
             const response = await fetch("http://localhost:4000/auth/register", {
@@ -50,7 +53,7 @@ const Register = ({setAuth}) => {
                 <input
                     type="text"
                     name="first_name"
-                    placeholder="First Name"
+                    placeholder="first Name"
                     value={first_name}
                     onChange={onChange}
                 />
@@ -58,15 +61,23 @@ const Register = ({setAuth}) => {
                 <input
                     type="text"
                     name="last_name"
-                    placeholder="Last Name"
+                    placeholder="last Name"
                     value={last_name}
+                    onChange={onChange}
+                />
+                <label>Nickname</label>
+                <input
+                    type="text"
+                    name="nickname"
+                    placeholder="nickname"
+                    value={nickname}
                     onChange={onChange}
                 />
                 <label>Email</label>
                 <input
                     type="email"
                     name="email"
-                    placeholder="Email"
+                    placeholder="email"
                     value={email}
                     onChange={onChange}
                 />
@@ -74,7 +85,7 @@ const Register = ({setAuth}) => {
                 <input
                     type="password"
                     name="password"
-                    placeholder="Password"
+                    placeholder="password"
                     value={password}
                     onChange={onChange}
                 />

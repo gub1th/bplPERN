@@ -26,7 +26,6 @@ const Login = ({setAuth}) => {
 
             if (parseRes.token) {   
                 localStorage.setItem("token", parseRes.token)
-                console.log("boom")
                 setAuth(true)
             } else {
                 setAuth(false)

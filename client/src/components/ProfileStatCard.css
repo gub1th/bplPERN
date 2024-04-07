@@ -1,0 +1,18 @@
+.card {
+    border-radius: 30px;
+    padding: 30px;
+    text-align: center;
+    max-width: 250px;
+    display: inline-block;
+    background: #000000;
+}
+
+#title {
+    color: white;
+    font-size: 30px;
+}
+
+#value {
+    color: white;
+    font-size: 50px;
+}

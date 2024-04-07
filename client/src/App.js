@@ -3,9 +3,12 @@ import './App.css';
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 
+import Register from "./components/Register"
 import Dashboard from "./components/Dashboard"
 import Login from "./components/Login"
-import Register from "./components/Register"
+import GuestHome from "./components/GuestHome"
+import Layout from "./components/Layout"
+import ProfilePage from "./components/ProfilePage"
 
 
 function App() {
@@ -38,11 +41,16 @@ function App() {
     <>
       <Router>
         <div className="container">
-          <Routes>
-            <Route exact path="/login" element={!isAuthenticated ? <Login setAuth={setAuth}/> : <Navigate replace to="/dashboard" />} />
-            <Route exact path="/register" element={!isAuthenticated ? <Register setAuth={setAuth}/> : <Navigate replace to="/login" />} />
-            <Route exact path="/dashboard" element={isAuthenticated ? <Dashboard setAuth={setAuth}/> : <Navigate replace to="/login" />} />
-          </Routes>
+        <Routes>
+          <Route path="/" element={<Layout isAuthenticated={isAuthenticated}/>}> {/* Wrap the main components in Layout */}
+            <Route index element={!isAuthenticated ? <GuestHome setAuth={setAuth}/> : <Navigate replace to="/dashboard" />} />
+            <Route path="login" element={!isAuthenticated ? <Login setAuth={setAuth}/> : <Navigate replace to="/dashboard" />} />
+            <Route path="register" element={!isAuthenticated ? <Register setAuth={setAuth}/> : <Navigate replace to="/dashboard" />} />
+            <Route path="dashboard" element={isAuthenticated ? <Dashboard setAuth={setAuth}/> : <Navigate replace to="/login" />} />
+            <Route path="profile" element={isAuthenticated ? <ProfilePage setAuth={setAuth}/> : <Navigate replace to="/login" />} />
+            {/* Add more routes here */}
+          </Route>
+        </Routes>
         </div>
       </Router>
     </>

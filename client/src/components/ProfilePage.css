@@ -1,0 +1,61 @@
+/* Add the CSS directly from Figma into this file, adjusting as necessary for CSS classes */
+.profile-page {
+    background: #000000;
+    position: relative;
+  }
+  
+#profile-header {
+    font-family: 'Inter';
+    font-style: normal;
+    color: #FFFFFF;
+}
+
+#profile-image {
+    width: 50px;
+    height: auto; 
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+#profile-name {
+    font-weight: 5;
+    font-size: 50px; 
+}
+
+#profile-nickname {
+    font-weight: 5;
+    font-size: 30px; 
+}
+
+#profile-team {
+    font-weight: 5;
+    font-size: 20px; 
+}
+
+/* #profile-stats {    
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 5;
+    font-size: 36px;
+    line-height: 44px;
+}
+
+.stat {
+    color: #FFFFFF;
+}
+
+.stat-value {
+    font-family: 'Inter';
+    font-style: bold;
+    font-weight: 5;
+    font-size: 36px;
+    line-height: 44px;
+}
+
+.stat-name {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 5;
+    font-size: 36px;
+    line-height: 44px;
+} */

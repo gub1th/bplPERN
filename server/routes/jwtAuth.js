@@ -8,13 +8,13 @@ const authorization = require("../middleware/authorization")
 router.post("/register", validInfo, async (req, res) => {
     try {
         // destructure req.body
-        const { first_name, last_name, email, password} = req.body
+        const { first_name, last_name, nickname, email, password} = req.body
 
         // check if the user exists (if exists then throw error)
         const user = await pool.query("SELECT * from users WHERE email = $1", [email])
         
         if (user.rows.length !== 0) {
-            return res.status(401).json("User already exists");
+            return res.status(401).json("Email already exists");
         }
 
         // bcrypt the user password
@@ -24,11 +24,15 @@ router.post("/register", validInfo, async (req, res) => {
         const bcryptPassword = await bcrypt.hash(password, salt);
 
         // enter the new user inside our database
-        const newUser = await pool.query("INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4) RETURNING *",
-        [first_name, last_name, email, bcryptPassword])
+        const newUser = await pool.query("INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
+            [email, bcryptPassword])
+
+        // create a profile for the new user
+        const profile = await pool.query("INSERT INTO profiles (user_id, first_name, last_name, nickname) VALUES ($1, $2, $3, $4) RETURNING *",
+            [newUser.rows[0].user_id, first_name, last_name, nickname])
 
         //generate our jwt token
-        const token = jwtGenerator(newUser.rows[0].id)
+        const token = jwtGenerator(newUser.rows[0].user_id)
 
         return res.json({token})
 
@@ -57,7 +61,7 @@ router.post("/login", validInfo, async (req, res) => {
         }
 
         // give them the jwt token
-        const token = jwtGenerator(user.rows[0].id)
+        const token = jwtGenerator(user.rows[0].user_id)
         return res.json({token})
 
     } catch (err) {
