@@ -14,7 +14,7 @@ router.post("/register", validInfo, async (req, res) => {
         const user = await pool.query("SELECT * from users WHERE email = $1", [email])
         
         if (user.rows.length !== 0) {
-            return res.status(401).send("User already exists");
+            return res.status(401).json("User already exists");
         }
 
         // bcrypt the user password
@@ -30,10 +30,9 @@ router.post("/register", validInfo, async (req, res) => {
         //generate our jwt token
         const token = jwtGenerator(newUser.rows[0].id)
 
-        res.json({token})
+        return res.json({token})
 
     } catch (err) {
-        console.log(err.message)
         res.status(500).send("Server error")
     }
 })
@@ -53,14 +52,13 @@ router.post("/login", validInfo, async (req, res) => {
 
         // check if incoming password is the same as database password
         const validPassword = await bcrypt.compare(password, user.rows[0].password)
-        console.log(validPassword)
         if (!validPassword) {
             return res.status(401).json("Password or email is incorrect")
         }
 
         // give them the jwt token
         const token = jwtGenerator(user.rows[0].id)
-        res.json({token})
+        return res.json({token})
 
     } catch (err) {
         console.log(err.message)
