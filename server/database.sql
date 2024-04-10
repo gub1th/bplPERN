@@ -36,6 +36,15 @@ CREATE TABLE profiles (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
+CREATE TABLE individual_rankings (
+    ranking_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    ranked_by_profile_id uuid NOT NULL,
+    ranked_profile_id uuid NOT NULL,
+    rank INTEGER NOT NULL,
+    FOREIGN KEY (ranked_by_profile_id) REFERENCES profiles(profile_id) ON DELETE CASCADE,
+    FOREIGN KEY (ranked_profile_id) REFERENCES profiles(profile_id) ON DELETE CASCADE
+);
+
 -- -- Tournaments Table
 -- CREATE TABLE tournaments (
 --     tournament_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),

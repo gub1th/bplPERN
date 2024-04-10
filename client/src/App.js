@@ -9,6 +9,7 @@ import Login from "./components/Login"
 import GuestHome from "./components/GuestHome"
 import Layout from "./components/Layout"
 import ProfilePage from "./components/ProfilePage"
+import Rankings from "./components/Rankings"
 
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
             <Route path="register" element={!isAuthenticated ? <Register setAuth={setAuth}/> : <Navigate replace to="/dashboard" />} />
             <Route path="dashboard" element={isAuthenticated ? <Dashboard setAuth={setAuth}/> : <Navigate replace to="/login" />} />
             <Route path="profile" element={isAuthenticated ? <ProfilePage setAuth={setAuth}/> : <Navigate replace to="/login" />} />
+            <Route path="rankings" element={isAuthenticated ? <Rankings setAuth={setAuth}/> : <Navigate replace to="/login" />} />
             {/* Add more routes here */}
           </Route>
         </Routes>

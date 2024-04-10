@@ -15,6 +15,9 @@ app.use("/auth", require("./routes/jwtAuth"))
 // dashboard route
 app.use("/dash", require("./routes/dashboard"))
 
+// ranking route
+app.use("/rankings", require("./routes/rankings"))
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
