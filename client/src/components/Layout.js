@@ -8,7 +8,7 @@ const Layout = ({isAuthenticated}) => {
     <>
       <Header isAuthenticated={isAuthenticated}/>
       <main>
-        <Outlet /> {/* This is where the nested route's components will be rendered */}
+        <Outlet />
       </main>
     </>
   );

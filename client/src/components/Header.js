@@ -1,22 +1,50 @@
 import React from 'react'
 import { Link } from "react-router-dom"
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
+
 const Header = ({isAuthenticated}) => {
 
     return (
-        <header>
-            <nav>
-                <Link to="/">BPL</Link>
+        <nav className="navbar">
+            <ul className="navbar-nav">
+                <li className="nav-item">
+                    <Link to="/" className="nav-link">
+                        <span className="nav-icon"><FontAwesomeIcon icon={faUser} /></span>
+                        <span className="link-text">BPL</span>
+                    </Link>
+                </li>
                 {isAuthenticated && (
                     <>
-                        <Link to="/tournaments">TOURNAMENTS</Link>
-                        <Link to="/players">PLAYERS</Link>
-                        <Link to="/gallery">GALLERY</Link>
-                        <Link to="/profile">PROFILE</Link>
+                        <li className="nav-item">
+                            <Link to="/tournaments" className="nav-link">
+                                <span className="nav-icon"><FontAwesomeIcon icon={faUser} /></span>
+                                <span className="link-text">TOURNAMENTS</span>
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to="/players" className="nav-link">
+                                <span className="nav-icon"><FontAwesomeIcon icon={faUser} /></span>
+                                <span className="link-text">PLAYERS</span>
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to="/rankings" className="nav-link">
+                                <span className="nav-icon"><FontAwesomeIcon icon={faUser} /></span>
+                                <span className="link-text">RANKINGS</span>
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to="/profile" className="nav-link">
+                                <span className="nav-icon"><FontAwesomeIcon icon={faUser} /></span>
+                                <span className="link-text">PROFILE</span>
+                            </Link>
+                        </li>
                     </>
                 )}
-            </nav>
-        </header>
+            </ul>
+        </nav>
     )
 }
 
