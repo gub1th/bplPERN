@@ -8,7 +8,9 @@ const Rankings = ({ setAuth }) => {
     const [profile, setProfile] = useState(null);
     const [optIn, setOptIn] = useState(false); // State for managing opt-in status
 
-    const { columnOrder, columns, tasks } = initialData;
+    // const { columnOrder, columns, tasks } = initialData;
+
+    const [state, setState] = useState(initialData)
 
 
     async function getProfile() {
@@ -59,6 +61,36 @@ const Rankings = ({ setAuth }) => {
       };
 
       function handleOnDragEnd(result) {
+        const { destination, source, draggableId } = result
+
+        if (!destination) {
+            return
+        }
+
+        if (destination.droppableId === source.droppableId && destination.index === source.index) {
+            return
+        }
+
+        const column = state.columns[source.droppableId]
+        const newTaskIds = Array.from(column.taskIds)
+        newTaskIds.splice(source.index, 1)
+        newTaskIds.splice(destination.index, 0, draggableId)
+
+        const newColumn = {
+            ...column,
+            taskIds: newTaskIds
+        }
+
+        const newState = {
+            ...state, 
+            columns: {
+                ...state.columns,
+                [newColumn.id]: newColumn
+            }
+        }
+
+        setState(newState)
+
       }
 
     useEffect(() => {
@@ -70,9 +102,9 @@ const Rankings = ({ setAuth }) => {
         <>
             <DragDropContext onDragEnd={handleOnDragEnd}>
                 <div>
-                    {columnOrder.map(columnId => {
-                        const column = columns[columnId];
-                        const tasksInColumn = column.taskIds.map(taskId => tasks[taskId]);
+                    {state.columnOrder.map(columnId => {
+                        const column = state.columns[columnId];
+                        const tasksInColumn = column.taskIds.map(taskId => state.tasks[taskId]);
 
                         return <Column key={column.id} column={column} tasks={tasksInColumn} />;
                     })}
