@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from "react";
+import initialData from "./initialData";
+import Column from './Column';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+
 
 const Rankings = ({ setAuth }) => {
     const [profile, setProfile] = useState(null);
     const [optIn, setOptIn] = useState(false); // State for managing opt-in status
+
+    const { columnOrder, columns, tasks } = initialData;
 
 
     async function getProfile() {
@@ -52,6 +58,9 @@ const Rankings = ({ setAuth }) => {
         updateOptInStatus(newOptInStatus);
       };
 
+      function handleOnDragEnd(result) {
+      }
+
     useEffect(() => {
         console.log("starting")
         getProfile();
@@ -59,7 +68,17 @@ const Rankings = ({ setAuth }) => {
 
     return (
         <>
-            <h1>Rankings!</h1>
+            <DragDropContext onDragEnd={handleOnDragEnd}>
+                <div>
+                    {columnOrder.map(columnId => {
+                        const column = columns[columnId];
+                        const tasksInColumn = column.taskIds.map(taskId => tasks[taskId]);
+
+                        return <Column key={column.id} column={column} tasks={tasksInColumn} />;
+                    })}
+                </div>
+            </DragDropContext>
+            {/* <h1>Rankings!</h1>
             <button onClick={() => console.log(optIn)}>state opt in</button>
             <button onClick={()=>console.log(profile?.opt_in)}>profile opt in</button>
             {profile !== null && ( // Check if profile is not null
@@ -68,8 +87,6 @@ const Rankings = ({ setAuth }) => {
                     <div>
                         <h2>Rankings. you made it here</h2>
                         <button onClick={handleOptInChange}>{profile.opt_in ? "Opt Out" : "Opt In"}</button>
-                        {/* Display rankings here */}
-
                     </div>
                 ) : (
                     // If user has not opted in, show message and option to opt-in
@@ -78,7 +95,7 @@ const Rankings = ({ setAuth }) => {
                         <button onClick={handleOptInChange}>{profile.opt_in ? "Opt Out" : "Opt In"}</button>
                     </div>
                 )
-            )}
+            )} */}
         </>
     );
 };
