@@ -1,19 +1,25 @@
 const initialData = {
-    tasks : {
-        'task-1': {id: 'task-1', content: 'take out apple'},
-        'task-2': {id: 'task-2', content: 'take out orange'},
-        'task-3': {id: 'task-3', content: 'take out banana'},
-        'task-4': {id: 'task-4', content: 'take out pear'},
+    players : {
+        'player-1': {id: 'player-1', content: 'daniel'},
+        'player-2': {id: 'player-2', content: 'jp'},
+        'player-3': {id: 'player-3', content: 'munoz'},
+        'player-4': {id: 'player-4', content: 'edwin'},
+        'player-5': {id: 'player-5', content: 'dh'},
     },
     columns : {
         'column-1': {
             id: 'column-1',
-            title: 'To Do',
-            taskIds: ['task-1', 'task-2', 'task-3', 'task-4']
-        }
+            title: 'Custom List',
+            playerIds: ['player-1', 'player-2', 'player-3', 'player-4']
+        },
+        'column-2': {
+            id: 'column-2',
+            title: 'To Be Ranked',
+            playerIds: []
+        },
     },
     // facilitate ordering of columns
-    columnOrder: ['column-1'],
+    columnOrder: ['column-1', 'column-2'],
 }
 
 export default initialData;
