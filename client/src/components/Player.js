@@ -11,10 +11,10 @@ const Container = styled.div`
 `;
 
 const Player = ({ player, index }) => 
-    <Draggable draggableId={player.id} index={index}>
+    <Draggable draggableId={player.profile_id} index={index}>
         {(provided, snapshot)=> (
             <Container ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} isDragging={snapshot.isDragging}>
-                {player.content}
+                {player.first_name + " " + player.last_name}``
             </Container>
         )}
     </Draggable>

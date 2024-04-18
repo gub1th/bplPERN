@@ -27,7 +27,7 @@ const Column = ({ column, players }) => (
     <StrictModeDroppable droppableId={column.id}>
         {(provided, snapshot) => (
             <PlayerList ref={provided.innerRef} {...provided.droppableProps} isDraggingOver={snapshot.isDraggingOver}>
-                {players.map((player, index) => <Player key={player.id} player={player} index={index}/>)}
+                {players.map((player, index) => <Player key={player.profile_id} player={player} index={index}/>)}
                 {provided.placeholder}
             </PlayerList>
         )}

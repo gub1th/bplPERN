@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import initialData from "./initialData";
 import Column from './Column';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import "./Rankings.css";
@@ -7,15 +6,53 @@ import "./Rankings.css";
 
 const Rankings = ({ setAuth }) => {
     const [profile, setProfile] = useState(null);
+    const [state, setState] = useState(null)
 
-    // const { columnOrder, columns, players } = initialData;
+    const finalizeRankings = async() => {
+        try {
+            for (const playerId in state.columns['column-1'].playerIds) {
+                // try to get the ranking object of that player
+                const response1 = await fetch(`http://localhost:4000/rankings/${playerId}`, {
+                    method: "GET",
+                    headers: { token: localStorage.token }
+                })
+                const playerRanking = await response1.json()
 
-    const [state, setState] = useState(initialData)
+                // if it doesn't exist, create it
+                if (!playerRanking) {
+                    const response2 = await fetch("http://localhost:4000/rankings/", {
+                        method: "POST",
+                        headers: { token: localStorage.token },
+                        body: JSON.stringify({
+                            player_id: playerId,
+                            rank: Object.keys(state.columns['column-1'].playerIds).indexOf(playerId) + 1
+                          })
+                    })
+                }
 
+                // if the old rank is the same as the new rank, no need to do anything
+                if (playerRanking.rank === Object.keys(state.columns['column-1'].playerIds).indexOf(playerId) + 1) {
+                    continue
+                }
+
+                // update the ranking in accordance with its position in column-1 playerIds index
+                const response3 = await fetch(`http://localhost:4000/rankings/${playerId}`, {
+                    method: "PUT",
+                    headers: { token: localStorage.token },
+                    body: JSON.stringify({
+                        rank: Object.keys(state.columns['column-1'].playerIds).indexOf(playerId) + 1
+                      })
+                })
+            }
+
+        } catch (err) {
+            console.log(err.message)
+        }
+    }
 
     async function getProfile() {
         try {
-            const response = await fetch("http://localhost:4000/rankings/", {
+            const response = await fetch("http://localhost:4000/rankings/profile", {
                 method: "GET",
                 headers: { token: localStorage.token }
             })
@@ -23,6 +60,81 @@ const Rankings = ({ setAuth }) => {
             const parseRes = await response.json()
             console.log(parseRes)
             setProfile(parseRes)
+        } catch (err) {
+            console.log(err.message)
+        }
+    }
+
+    async function getInitialData() {
+        try {
+            // get id, first name, last name (and image) of all all profiles.
+            const response1 = await fetch("http://localhost:4000/rankings/profiles", {
+                method: "GET",
+                headers: { token: localStorage.token }
+            })
+
+            // get own profile 
+            const responseP = await fetch("http://localhost:4000/rankings/profile", {
+                method: "GET",
+                headers: { token: localStorage.token }
+            })
+
+            const userProfile = await responseP.json()
+
+            const allProfiles = await response1.json()
+            console.log("here1")
+
+            // convert to a dict with this format: {'player-1': {id: 'player-1', first_name: 'daniel', last_namge, image},}
+            const playersDict = {}
+            for (let i = 0; i < allProfiles.length; i++) {
+                playersDict[allProfiles[i].profile_id] = allProfiles[i]
+            }
+
+            // filter out own profile
+            delete playersDict[userProfile.profile_id]
+
+            // get ranked profiles
+            const response2 = await fetch("http://localhost:4000/rankings/ranked-profiles", {
+                method: "GET",
+                headers: { token: localStorage.token }
+            })
+
+            const rankedProfiles = await response2.json()
+            console.log("here2")
+            console.log(rankedProfiles)
+            console.log(userProfile)
+            // get ids of ranked profile. put in list
+            var rankedProfileIds = []
+            for (let i = 0; i < rankedProfiles.length; i++) {
+                if (rankedProfiles[i].profile_id === userProfile.profile_id) {
+                    continue
+                }
+                rankedProfileIds.push(rankedProfiles[i].profile_id)
+            }
+            
+            // get ids of unranked profiles. put in list
+            const unrankedProfileIds = Object.keys(playersDict).filter(key => !rankedProfileIds.includes(key))
+            var currData = {
+                players : playersDict,
+                columns : {
+                    'column-1': {
+                        id: 'column-1',
+                        title: 'Ranked',
+                        playerIds: rankedProfileIds
+                    },
+                    'column-2': {
+                        id: 'column-2',
+                        title: 'Unranked',
+                        playerIds: unrankedProfileIds
+                    },
+                },
+                // facilitate ordering of columns
+                columnOrder: ['column-1', 'column-2'],
+            }
+            console.log(currData)
+            console.log("here3")
+            setState(currData)
+
         } catch (err) {
             console.log(err.message)
         }
@@ -37,15 +149,30 @@ const Rankings = ({ setAuth }) => {
       }
 
       function handleOnDragEnd(result) {
+        console.log("drag end")
         const { destination, source, draggableId } = result
 
         if (!destination) {
+            console.log("ret 1")
+            return
+        }
+        // cannot move in same exact spot
+        if (destination.droppableId === source.droppableId && destination.index === source.index) {
+            console.log("ret 2")
+            return
+        }
+        // cannot move from unranked to unranked
+        if (destination.droppableId === "column-2" && source.droppableId === "column-2") {
+            console.log("ret 3")
             return
         }
 
-        if (destination.droppableId === source.droppableId && destination.index === source.index) {
+        //cannot move from ranked to unranked (to make it easier for now)
+        if (destination.droppableId === "column-2" && source.droppableId === "column-1") {
+            console.log("ret 4")
             return
         }
+
 
         const start = state.columns[source.droppableId]
         const finish = state.columns[destination.droppableId]
@@ -67,6 +194,8 @@ const Rankings = ({ setAuth }) => {
                     [newColumn.id]: newColumn
                 }
             }
+
+            // make the post request to update the individual_rankings table (or make a button that recalculates at the end)
 
             setState(newState)
             return
@@ -95,6 +224,7 @@ const Rankings = ({ setAuth }) => {
                 [newFinish.id]: newFinish
             }
         }
+        // make the post request to update the individual_rankings table
         setState(newState)
 
       }
@@ -102,17 +232,22 @@ const Rankings = ({ setAuth }) => {
     useEffect(() => {
         console.log("starting")
         getProfile();
+        getInitialData();
+        console.log(state)
+        console.log("end")
     }, []);
 
     return (
         <>
             <h1>Rankings!</h1>
-            {profile !== null && ( // Check if profile is not null
+            {profile !== null && state !== null && ( // Check if profile is not null
                     <div>
                         <h2>Rankings. you made it here</h2>
                         
                         <DragDropContext onDragStart={handleOnDragStart} onDragUpdate={handleOnDragUpdate} onDragEnd={handleOnDragEnd}>
                             <div id="ranking-container">
+                                {/* <Column key={} column={col1} players={rankedProfiles}/>
+                                <Column key={} column={col2} players={notRankedProfiles}/> */}
                                 {state.columnOrder.map(columnId => {
                                     const column = state.columns[columnId];
                                     const playersInColumn = column.playerIds.map(playerId => state.players[playerId]);
@@ -121,6 +256,7 @@ const Rankings = ({ setAuth }) => {
                                 })}
                             </div>
                         </DragDropContext>
+                        <button onClick={finalizeRankings}>Finalize Rankings</button>
 
                     </div>
                 
