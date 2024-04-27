@@ -18,7 +18,7 @@ router.get("/profile", authorization, async(req, res) => {
 })
 
 // get all profiles
-router.get("/profiles", async(req, res) => {
+router.get("/profiles", authorization, async(req, res) => {
     try {
         const profiles = await pool.query("SELECT * FROM profiles")
         console.log(profiles.rows)
