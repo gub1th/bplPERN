@@ -1,7 +1,8 @@
-import React, { useState } from "react"
-import { Link } from "react-router-dom"
+import React, { useState, useEffect } from "react"
+import { Link, useNavigate } from "react-router-dom"
 
 const Login = ({setAuth}) => {
+    const navigate = useNavigate(); // Use the useNavigate hook to access the navigate function
 
     const [inputs, setInputs] = useState({
         email: "",
@@ -41,6 +42,27 @@ const Login = ({setAuth}) => {
         setInputs({...inputs, [e.target.name] : e.target.value})
     }
 
+    const handleGoogleCallback = async () => {      
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const token = urlParams.get('token');
+      
+          if (token) {
+            localStorage.setItem('token', token);
+            setAuth(true);
+            navigate('/dashboard'); // Navigate to the dashboard route
+          } else {
+            setAuth(false);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        handleGoogleCallback();
+      }, []);
+
     return (
         <>
             <h1>Login</h1>
@@ -52,6 +74,7 @@ const Login = ({setAuth}) => {
 
                 <button type="submit">Submit</button>
             </form>
+            <a href="http://localhost:4000/oauth/google/redirect">Login With Google</a>
             <Link to="/register">Register</Link>
         </>
     )

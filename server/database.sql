@@ -17,6 +17,7 @@ CREATE TABLE users (
     user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     email VARCHAR(255) UNIQUE,
     password VARCHAR(255),
+    google_id VARCHAR(255) UNIQUE,
     roles TEXT[] DEFAULT ARRAY['Player']::TEXT[],
     is_active BOOLEAN DEFAULT true,
     registered_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
@@ -28,8 +29,8 @@ CREATE TABLE profiles (
     user_id uuid,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
+    image_url TEXT,
     nickname VARCHAR(255),
-    avatar_url TEXT,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
     opt_in BOOLEAN DEFAULT false,
