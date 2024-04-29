@@ -10,44 +10,17 @@ const Rankings = ({ setAuth }) => {
 
     const finalizeRankings = async() => {
         try {
-            for (const playerId in state.columns['column-1'].playerIds) {
-                // try to get the ranking object of that player
-                const response1 = await fetch(`http://localhost:4000/rankings/${playerId}`, {
-                    method: "GET",
-                    headers: { token: localStorage.token }
-                })
-                const playerRanking = await response1.json()
-
-                // if it doesn't exist, create it
-                if (!playerRanking) {
-                    const response2 = await fetch("http://localhost:4000/rankings/", {
-                        method: "POST",
-                        headers: { token: localStorage.token },
-                        body: JSON.stringify({
-                            player_id: playerId,
-                            rank: Object.keys(state.columns['column-1'].playerIds).indexOf(playerId) + 1
-                          })
-                    })
-                }
-
-                // if the old rank is the same as the new rank, no need to do anything
-                if (playerRanking.rank === Object.keys(state.columns['column-1'].playerIds).indexOf(playerId) + 1) {
-                    continue
-                }
-
-                // update the ranking in accordance with its position in column-1 playerIds index
-                const response3 = await fetch(`http://localhost:4000/rankings/${playerId}`, {
-                    method: "PUT",
-                    headers: { token: localStorage.token },
-                    body: JSON.stringify({
-                        rank: Object.keys(state.columns['column-1'].playerIds).indexOf(playerId) + 1
-                      })
-                })
-            }
-
+            console.log(state)
+            console.log(JSON.stringify(state))
+            const response = await fetch ("http://localhost:4000/rankings/finalize", {
+            method: "POST",
+            headers: { token: localStorage.token, 'Content-Type': 'application/json' },
+            body: JSON.stringify(state),
+        })
         } catch (err) {
             console.log(err.message)
         }
+        
     }
 
     async function getProfile() {
@@ -256,7 +229,7 @@ const Rankings = ({ setAuth }) => {
                                 })}
                             </div>
                         </DragDropContext>
-                        <button onClick={finalizeRankings}>Finalize Rankings</button>
+                        <button onClick={() => finalizeRankings()}>Finalize Rankings</button>
 
                     </div>
                 
