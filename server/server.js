@@ -18,6 +18,9 @@ app.use("/dash", require("./routes/dashboard"))
 // ranking route
 app.use("/rankings", require("./routes/rankings"))
 
+// oauth route
+app.use("/oauth", require("./routes/oauth"))
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
