@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Column from './Column';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import GeneralRankingCard from "./GeneralRankingCard";
 import "./Rankings.css";
 
 
 const Rankings = ({ setAuth }) => {
     const [profile, setProfile] = useState(null);
-    const [state, setState] = useState(null)
+    const [state, setState] = useState(null);
+    const [generalRankings, setGeneralRankings] = useState(null)
 
     const finalizeRankings = async() => {
         try {
-            console.log(state)
-            console.log(JSON.stringify(state))
             const response = await fetch ("http://localhost:4000/rankings/finalize", {
             method: "POST",
             headers: { token: localStorage.token, 'Content-Type': 'application/json' },
@@ -31,7 +31,6 @@ const Rankings = ({ setAuth }) => {
             })
 
             const parseRes = await response.json()
-            console.log(parseRes)
             setProfile(parseRes)
         } catch (err) {
             console.log(err.message)
@@ -55,7 +54,6 @@ const Rankings = ({ setAuth }) => {
             const userProfile = await responseP.json()
 
             const allProfiles = await response1.json()
-            console.log("here1")
 
             // convert to a dict with this format: {'player-1': {id: 'player-1', first_name: 'daniel', last_namge, image},}
             const playersDict = {}
@@ -72,10 +70,9 @@ const Rankings = ({ setAuth }) => {
                 headers: { token: localStorage.token }
             })
 
-            const rankedProfiles = await response2.json()
-            console.log("here2")
-            console.log(rankedProfiles)
-            console.log(userProfile)
+            var rankedProfiles = await response2.json()
+            // sort ranked Profiles by rank
+            rankedProfiles = rankedProfiles.sort((a, b) => a.rank - b.rank)
             // get ids of ranked profile. put in list
             var rankedProfileIds = []
             for (let i = 0; i < rankedProfiles.length; i++) {
@@ -104,10 +101,23 @@ const Rankings = ({ setAuth }) => {
                 // facilitate ordering of columns
                 columnOrder: ['column-1', 'column-2'],
             }
-            console.log(currData)
-            console.log("here3")
             setState(currData)
 
+        } catch (err) {
+            console.log(err.message)
+        }
+    }
+
+    async function getGeneralRankings() {
+        try {
+            const response = await fetch("http://localhost:4000/rankings/general", {
+                method: "GET",
+                headers: { token: localStorage.token }
+            })
+            const parseRes = await response.json()
+            console.log("general!")
+            console.log(parseRes)
+            setGeneralRankings(parseRes)
         } catch (err) {
             console.log(err.message)
         }
@@ -203,11 +213,9 @@ const Rankings = ({ setAuth }) => {
       }
 
     useEffect(() => {
-        console.log("starting")
         getProfile();
         getInitialData();
-        console.log(state)
-        console.log("end")
+        getGeneralRankings();
     }, []);
 
     return (
@@ -230,6 +238,12 @@ const Rankings = ({ setAuth }) => {
                             </div>
                         </DragDropContext>
                         <button onClick={() => finalizeRankings()}>Finalize Rankings</button>
+                        <h2>General Rankings</h2>
+                        <div id="general_rankings">
+                            {generalRankings.map((elem, index) => (
+                                <GeneralRankingCard elem={elem} key={index} />
+                            ))}
+                        </div>
 
                     </div>
                 

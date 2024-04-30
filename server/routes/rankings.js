@@ -2,12 +2,9 @@ const router = require("express").Router()
 const pool = require("../db")
 const authorization = require("../middleware/authorization")
 
-const { v4: uuidv4 } = require('uuid');
-
 // get particular profile
 router.get("/profile", authorization, async(req, res) => {
     try {
-        console.log("WE ARE HERE FOR GETTING PROFILE")
         const profile = await pool.query("SELECT * FROM profiles WHERE user_id = $1", [req.user])
         res.json(profile.rows[0])
     } catch (err) {
@@ -20,7 +17,6 @@ router.get("/profile", authorization, async(req, res) => {
 router.get("/profiles", authorization, async(req, res) => {
     try {
         const profiles = await pool.query("SELECT * FROM profiles")
-        console.log(profiles.rows)
         res.json(profiles.rows)
     } catch (err) {
         console.log(err.message)
@@ -33,11 +29,8 @@ router.get("/ranked-profiles", authorization, async(req, res) => {
     try {
         const profile = await pool.query("SELECT * FROM profiles WHERE user_id = $1", [req.user])
         const profileId = profile.rows[0].profile_id
-        console.log(profileId)
-        const rankedProfilesPostgres = await pool.query("SELECT DISTINCT p.* FROM profiles as p JOIN individual_rankings as r ON p.profile_id = r.ranked_profile_id WHERE r.ranked_by_profile_id=$1", [profileId])
+        const rankedProfilesPostgres = await pool.query("SELECT DISTINCT p.*, r.* FROM profiles as p JOIN individual_rankings as r ON p.profile_id = r.ranked_profile_id WHERE r.ranked_by_profile_id=$1", [profileId])
         const rankedProfiles = rankedProfilesPostgres
-        console.log("heee")
-        console.log(rankedProfiles.rowCount)
         res.json(rankedProfiles.rows)
     } catch (err) {
         console.log(err.message)
@@ -46,7 +39,7 @@ router.get("/ranked-profiles", authorization, async(req, res) => {
 })
 
 // get specific ranking based on playerId provided
-router.get("/:playerId", authorization, async(req, res) => {
+router.get("/:playerId([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})", authorization, async(req, res) => {
     try {
         const { playerId } = req.params
         const profile = await pool.query("SELECT * FROM profiles WHERE user_id = $1", [req.user]);
@@ -63,57 +56,42 @@ router.post("/finalize", authorization,async(req, res) => {
     //convert the state (req.body) to an object after it was json stringified
     console.log("finalize starting")
     state = req.body
-    console.log(2222)
     rankedColumn = state.columns['column-1']
-    console.log(rankedColumn)
-    console.log(3333333)
-    console.log(rankedColumn.playerIds)
     // sort based on rank in descending order
     var sortedPlayerIds = rankedColumn.playerIds.sort((a, b) => {
         const rankingA = rankedColumn.playerIds.indexOf(a)
         const rankingB = rankedColumn.playerIds.indexOf(b)
         return rankingA - rankingB
     })
-    console.log("4444")
-    console.log(sortedPlayerIds)
 
     const profile = await pool.query("SELECT * FROM profiles WHERE user_id = $1", [req.user])
     const profileId = profile.rows[0].profile_id
     // for each player
     try { 
         for (const playerId of sortedPlayerIds) { // try to get the ranking object of that player
-            console.log('starting loop')
-            console.log(playerId)
-
-            console.log(1)
             const ranking = await pool.query("SELECT * FROM individual_rankings WHERE ranked_profile_id = $1 AND ranked_by_profile_id = $2", [playerId, profileId])
             const oldPlayerRanking = ranking.rows[0] 
             var newPlayerRanking = ranking.rows[0]
-            console.log(2)
             const newPlayerRank = rankedColumn.playerIds.indexOf(playerId) + 1
-            console.log(playerId, profileId)
             // if it doesn't exist, create it
             if (!oldPlayerRanking) {
-                newPlayerRankingObj = await pool.query("INSERT INTO individual_rankings (ranked_profile_id, ranked_by_profile_id, rank) VALUES ($1, $2, $3) RETURNING *",
+                const newPlayerRankingObj = await pool.query("INSERT INTO individual_rankings (ranked_profile_id, ranked_by_profile_id, rank) VALUES ($1, $2, $3) RETURNING *",
                                                 [playerId, profileId, newPlayerRank])
                 newPlayerRanking = newPlayerRankingObj.rows[0]
-                return res.status(200).json({ message: "Ranking added!" });
+                continue
             }
-            console.log(3)
             // if the old rank is the same as the new rank, no need to do anything
-            if (oldPlayerRanking.rank === newPlayerRanking.rank) {
-                console.log("here")
-                return res.status(200).json({ message: "Rank not changed" });
+            if (oldPlayerRanking.rank === newPlayerRank) {
+                continue
             }
 
-            console.log(4)
             // update the ranking in accordance with its position in column-1 playerIds index
             const newRanking = await pool.query("UPDATE individual_rankings SET rank = $3 WHERE ranked_profile_id = $1 AND ranked_by_profile_id = $2 RETURNING *",
                                                 [playerId, profileId, newPlayerRank])
-            console.log(5)
-            return res.status(200).json({ message: "Rank updated successfully" });
+            // return res.status(200).json({ message: "Rank updated successfully" });
 
         }
+        return res.status(200).json({ message: "Ranks finalized and updated successfully" });
 
     } catch (err) {
         console.log(err.message)
@@ -134,6 +112,25 @@ router.put("/:playerId", async (req, res) => {
       res.status(500).json({ error: "Server error" });
     }
   });
+
+router.get("/general", authorization, async (req, res) => {
+    try {
+        console.log("here")
+        //const rankingAggregates = await pool.query("SELECT ranked_profile_id, SUM(rank) AS aggregate_rank FROM individual_rankings GROUP BY ranked_profile_id ORDER BY aggregate_rank ASC")
+        const rankingAggregates = await pool.query(`
+            SELECT profiles.*, individual_rankings.rank, SUM(individual_rankings.rank) AS aggregate_rank
+            FROM individual_rankings
+            JOIN profiles ON individual_rankings.ranked_profile_id = profiles.profile_id
+            GROUP BY individual_rankings.ranked_profile_id, profiles.profile_id, individual_rankings.rank
+            ORDER BY aggregate_rank ASC
+        `);
+        res.json(rankingAggregates.rows)
+    } catch (err) {
+        console.log("fuck")
+        console.log(err.message)
+        res.status(500).json("Server error")
+    }
+})
 
 // router.post("/optin", authorization, async (req, res) => {
 //     try {

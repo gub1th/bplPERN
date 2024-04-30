@@ -14,7 +14,7 @@ const Player = ({ player, index }) =>
     <Draggable draggableId={player.profile_id} index={index}>
         {(provided, snapshot)=> (
             <Container ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} isDragging={snapshot.isDragging}>
-                {player.first_name + " " + player.last_name}``
+                {player.first_name + " " + player.last_name + " " + player.profile_id}``
             </Container>
         )}
     </Draggable>
