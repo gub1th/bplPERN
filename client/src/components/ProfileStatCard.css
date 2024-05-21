@@ -10,9 +10,11 @@
 #title {
     color: white;
     font-size: 30px;
+    margin: 0;
 }
 
 #value {
     color: white;
     font-size: 50px;
+    margin: 0;
 }

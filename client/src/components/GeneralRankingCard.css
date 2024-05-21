@@ -1,4 +1,10 @@
 .general-ranking-card {
-    border-radius: 30px;
+    display: inline-flex;
+    border-radius: 10px;
+    background-color: rgb(65, 65, 65);
     text-align: center;
+    padding: 20px;
+    justify-content: space-between;
+    flex: 1;
+    min-width: 40%;
 }

@@ -117,19 +117,38 @@ router.get("/general", authorization, async (req, res) => {
     try {
         console.log("here")
         //const rankingAggregates = await pool.query("SELECT ranked_profile_id, SUM(rank) AS aggregate_rank FROM individual_rankings GROUP BY ranked_profile_id ORDER BY aggregate_rank ASC")
+        // const rankingAggregates = await pool.query(`
+        //     SELECT profiles.*, individual_rankings.rank, SUM(individual_rankings.rank) AS aggregate_rank
+        //     FROM individual_rankings
+        //     JOIN profiles ON individual_rankings.ranked_profile_id = profiles.profile_id
+        //     GROUP BY individual_rankings.ranked_profile_id, profiles.profile_id, individual_rankings.rank
+        //     ORDER BY aggregate_rank ASC
+        // `);
         const rankingAggregates = await pool.query(`
-            SELECT profiles.*, individual_rankings.rank, SUM(individual_rankings.rank) AS aggregate_rank
-            FROM individual_rankings
-            JOIN profiles ON individual_rankings.ranked_profile_id = profiles.profile_id
-            GROUP BY individual_rankings.ranked_profile_id, profiles.profile_id, individual_rankings.rank
-            ORDER BY aggregate_rank ASC
+            SELECT ranked_profile_id, SUM(points), first_name, last_name 
+            FROM 
+                (SELECT 
+                    i.ranked_profile_id,
+                    i.rank,
+                    (
+                        SELECT COUNT(*) FROM individual_rankings as r WHERE r.ranked_by_profile_id = i.ranked_by_profile_id GROUP BY r.ranked_by_profile_id
+                    ) - i.rank + 1 AS points,
+                    p.first_name as first_name,
+                    p.last_name as last_name
+                FROM 
+                    individual_rankings AS i
+                JOIN
+                    profiles AS p
+                ON
+                    i.ranked_profile_id = p.profile_id)
+            GROUP BY ranked_profile_id, first_name, last_name
+            ORDER BY SUM(points) DESC
         `);
-        res.json(rankingAggregates.rows)
-    } catch (err) {
-        console.log("fuck")
-        console.log(err.message)
-        res.status(500).json("Server error")
-    }
+
+        res.json(rankingAggregates.rows);
+        } catch (err) {
+            console.log(err.message)
+            res.status(500).json("Server error")}
 })
 
 // router.post("/optin", authorization, async (req, res) => {

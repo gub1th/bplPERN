@@ -240,8 +240,8 @@ const Rankings = ({ setAuth }) => {
                         <button onClick={() => finalizeRankings()}>Finalize Rankings</button>
                         <h2>General Rankings</h2>
                         <div id="general_rankings">
-                            {generalRankings.map((elem, index) => (
-                                <GeneralRankingCard elem={elem} key={index} />
+                            {generalRankings && generalRankings.map((elem, index) => (
+                                <GeneralRankingCard elem={elem} key={index} index={index} />
                             ))}
                         </div>
 

@@ -1,3 +1,10 @@
 #ranking-container {
     display: flex;
 }
+
+#general_rankings {
+    display: flex;
+    flex-direction: column;  /* Adjust if you want horizontal layout */
+    flex-wrap: wrap;      /* Allow wrapping of cards */
+    align-items: flex-start;
+ }

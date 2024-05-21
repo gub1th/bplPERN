@@ -4,7 +4,9 @@ import './GeneralRankingCard.css';
 export default function GeneralRankingCard({ elem, index }) {
     return (
         <div className="general-ranking-card">
-            <div className="general-ranking-card-name">{elem.first_name} {elem.last_name}</div>
+            <span>{index+1}</span>
+            <span>{elem.first_name + " " + elem.last_name}</span>
+            <span>{elem.sum}</span>
         </div>
     )
 }

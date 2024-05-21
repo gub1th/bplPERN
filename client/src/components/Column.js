@@ -7,7 +7,7 @@ import { StrictModeDroppable } from "./StrictModeDroppable";
 const Container = styled.div`
   margin: 8px;
   border: 1px solid lightgrey;
-  border-radius: 2px;
+  border-radius: 30px;
   width: 250px;
 `;
 const Title = styled.h3`
@@ -22,17 +22,20 @@ const PlayerList = styled.div`
 `;
 
 const Column = ({ column, players }) => (
-  <Container>
-    <Title>{column.title}</Title>
-    <StrictModeDroppable droppableId={column.id}>
-        {(provided, snapshot) => (
-            <PlayerList ref={provided.innerRef} {...provided.droppableProps} isDraggingOver={snapshot.isDraggingOver}>
-                {players.map((player, index) => <Player key={player.profile_id} player={player} index={index}/>)}
-                {provided.placeholder}
-            </PlayerList>
-        )}
-    </StrictModeDroppable>
-  </Container>
+  <>
+    
+    <Container>
+      <Title>{column.title}</Title>
+      <StrictModeDroppable droppableId={column.id}>
+          {(provided, snapshot) => (
+              <PlayerList ref={provided.innerRef} {...provided.droppableProps} isDraggingOver={snapshot.isDraggingOver}>
+                  {players.map((player, index) => <Player key={player.profile_id} player={player} index={index}/>)}
+                  {provided.placeholder}
+              </PlayerList>
+          )}
+      </StrictModeDroppable>
+    </Container>
+  </>
 );
 
 export default Column;
