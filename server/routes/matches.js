@@ -167,4 +167,26 @@ router.get("/:matchId/teams", authorization, async(req, res) => {
     }
 })
 
+// get the players of a particular match
+router.get("/:matchId/players", authorization, async(req, res) => {
+    try {
+        const { matchId } = req.params
+        const matchObj = await pool.query("SELECT * FROM matches WHERE match_id = $1", [matchId])
+        const match = matchObj.rows[0]
+
+        var homeTeamObj = await pool.query("SELECT * FROM teams WHERE team_id = $1", [match.team1_id])
+        var awayTeamObj = await pool.query("SELECT * FROM teams WHERE team_id = $1", [match.team2_id])
+        homeTeam = homeTeamObj.rows[0]
+        awayTeam = awayTeamObj.rows[0]
+
+        const playerIds = [homeTeam.member1_id, homeTeam.member2_id, awayTeam.member1_id, awayTeam.member2_id]
+        const playersObj = await pool.query("SELECT * FROM profiles WHERE profile_id = ANY($1)", [playerIds])
+
+        res.json(playersObj.rows)
+    } catch (err) {
+        console.log(err.message)
+        res.status(500).json("Server error")
+    }
+})
+
 module.exports = router
