@@ -352,7 +352,7 @@ const BracketDetails = () => {
                                                                     <tr className="tournament-bracket__team">
                                                                         <td className="tournament-bracket__country">
                                                                         <span className="tournament-bracket__code">
-                                                                            {bracketTeams.find(team => team.team_id === currMatch.team2_id)?.name}
+                                                                            {bracketTeams.find(team => team.team_id === currMatch.team2_id)?.name || "Bye"}
                                                                         </span>
                                                                         </td>
                                                                         <td className="tournament-bracket__score">
