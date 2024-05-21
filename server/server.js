@@ -18,6 +18,24 @@ app.use("/dash", require("./routes/dashboard"))
 // ranking route
 app.use("/rankings", require("./routes/rankings"))
 
+// tournament route
+app.use("/tournaments", require("./routes/tournaments"))
+
+// bracket route
+app.use("/brackets", require("./routes/brackets"))
+
+// profile route
+app.use("/profiles", require("./routes/profiles"))
+
+// team route
+app.use("/teams", require("./routes/teams"))
+
+// match route
+app.use("/matches", require("./routes/matches"))
+
+// set route
+app.use("/matchSets", require("./routes/matchSets"))
+
 // oauth route
 app.use("/oauth", require("./routes/oauth"))
 

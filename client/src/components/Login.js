@@ -24,11 +24,14 @@ const Login = ({setAuth}) => {
             })
 
             const parseRes = await response.json()
-
+            console.log("here on teh frontend")
+            console.log(parseRes.token)
             if (parseRes.token) {   
+                console.log("yipee")
                 localStorage.setItem("token", parseRes.token)
                 setAuth(true)
             } else {
+                console.log("boo")
                 setAuth(false)
             }
 

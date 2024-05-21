@@ -27,9 +27,15 @@ const ProfilePage = () => {
             {/* Profile Header */}
             <div id="profile-header">
                 <img id="profile-image" src={defaultProfileImg} alt="Profile" />
-                <h1 id="profile-name">{`${dummyProfile.firstName} ${dummyProfile.lastName}`}</h1>
-                <h2 id="profile-nickname">{`"${dummyProfile.nickname}"`}</h2>
-                <p id="profile-team">{`current team: ${dummyProfile.team}`}</p>
+                <div id="profile-info">
+                    <h1 className="profile-name">{`${dummyProfile.firstName}`}</h1>
+                    <h1 className="profile-name">{`${dummyProfile.lastName}`}</h1>
+                    <p id="profile-nickname">{`"${dummyProfile.nickname}"`}</p>
+                </div>
+                <div id="profile-team-info">
+                    <p className="profile-team-info-text inter-bold" >current team</p>
+                    <p className="profile-team-info-text">{dummyProfile.team}</p>
+                </div>
             </div>
 
             {/* Profile Stats */}

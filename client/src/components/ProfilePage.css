@@ -1,35 +1,46 @@
 /* Add the CSS directly from Figma into this file, adjusting as necessary for CSS classes */
 .profile-page {
     background: #000000;
-    position: relative;
+    display: flex;
+    flex-direction: column;
   }
   
 #profile-header {
-    font-family: 'Inter';
-    font-style: normal;
     color: #FFFFFF;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    border-color: white;
+    border-style: solid;
+    border-radius: 15px;
+    border-width: 2px;
+    margin-left: -5%;
+    margin-right: 5%;
+    margin-top: 5%;
+    padding-bottom: 30px;
+    padding-top: 30px;
 }
 
 #profile-image {
-    width: 50px;
-    height: auto; 
+    width: 200px;
+    height: 200px; 
     border-radius: 50%;
     object-fit: cover;
 }
 
-#profile-name {
-    font-weight: 5;
-    font-size: 50px; 
+.profile-name {
+    font-size: 70px; 
+    margin: 0;
 }
 
 #profile-nickname {
-    font-weight: 5;
     font-size: 30px; 
 }
 
-#profile-team {
-    font-weight: 5;
-    font-size: 20px; 
+.profile-team-info-text {
+    font-size: 25px;
+    margin: 0;
 }
 
 /* #profile-stats {    
