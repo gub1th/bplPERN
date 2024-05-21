@@ -165,7 +165,7 @@ const MatchDetails = () => {
                         </label>
                         <label>
                             Home/Away
-                            <select name="homeTeamId" value={matchFormData.homeId} onChange={e => setMatchFormData({ ...matchFormData, homeId: e.target.value })}>
+                            <select name="homeTeamId" value={matchFormData.homeTeamId} onChange={e => setMatchFormData({ ...matchFormData, homeId: e.target.value })}>
                                 {matchTeams
                                     .map(team => 
                                         <option key={team.team_id} value={team.team_id}>

@@ -62,6 +62,17 @@ router.patch("/:matchId", authorization, async(req, res) => {
     try {
         const matchId = req.params.matchId
         const { date, location, homeTeamId, winnerId, sets } = req.body
+        console.log(date, location, homeTeamId, winnerId, sets)
+
+        // get current match
+        var currMatch = await pool.query(
+            "SELECT * FROM matches WHERE match_id = $1",
+            [matchId]
+        )
+        currMatch = currMatch.rows[0]
+        console.log(currMatch)
+
+        // general updates for match
         const updateMatch = await pool.query(
             "UPDATE matches SET match_date = $1, location = $2, home_team_id = $3, winner_id = $4 WHERE match_id = $5 RETURNING *",
             [date, location, homeTeamId, winnerId, matchId]
@@ -70,11 +81,12 @@ router.patch("/:matchId", authorization, async(req, res) => {
 
         // get the current matchsets
         var matchSets = await pool.query(
-            "SELECT * FROM match_sets WHERE match_id = $1 RETURNING *",
+            "SELECT * FROM match_sets WHERE match_id = $1",
             [matchId]
         )
         matchSets = matchSets.rows
-        // delete if there are less (this prob wont happen often)
+
+        // delete if there are less sets than current (this prob wont happen often)
         if (sets.length < matchSets.length) {
             for (i=matchSets.length; i > sets.length; i--) {
                 var currMatchSetIndex = matchSets[i].set_number
@@ -86,9 +98,13 @@ router.patch("/:matchId", authorization, async(req, res) => {
             }
         }
         
+        // there are more or equal sets than are currently in the db
         for (i=0; i<sets.length; i++) {
             currSet = sets[i]
-            if (i > matchSets.length) {
+            const winningTeamId = sets[i].score_team1 > sets[i].score_team2 ? currMatch.team1_id : currMatch.team2_id
+            console.log(winningTeamId)
+            console.log("winning team iddd\n\n\n\n\n")
+            if (i > matchSets.length-1) {
                 // create a new one
                 await pool.query(
                     `
@@ -96,22 +112,20 @@ router.patch("/:matchId", authorization, async(req, res) => {
                     VALUES($1, $2, $3, $4, $5)
                     RETURNING *
                     `,
-                    [matchId, i, currSet.score_team1, currSet.score_team2, currSet.winning_team_id]
+                    [matchId, i+1, currSet.score_team1, currSet.score_team2, winningTeamId]
                 )
             } else {
                 // update the existing one
                 await pool.query(
                     "UPDATE match_sets SET score_team1=$1, score_team2=$2, winning_team_id=$3 WHERE match_id=$4 AND set_number=$5",
-                    [currSet.score_team1, currSet.score_team2, currSet.winning_team_id, matchId, i]
+                    [currSet.score_team1, currSet.score_team2, winningTeamId, matchId, i+1]
                 )
             }
         
         }
-        // now we update the match sets
-        const updateSets = await pool.query(
-            "UPDATE match_sets SET _ "
-        )
-        res.json(updateMatch.rows[0])
+
+        // send a success message as a string
+        res.json("success")
     } catch (err) {
         console.log(err.message)
         res.status(500).json("Server error")

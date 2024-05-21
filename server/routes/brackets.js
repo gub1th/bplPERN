@@ -240,6 +240,21 @@ router.post("/:bracketId/finalize", async (req, res) => {
                 const { rows } = await pool.query(query, values);
                 match = rows[0];
                 currRoundMatches.push(match)
+
+                // if team gets a bye, advance them to next round
+                const hasBye = !match.team2_id
+                // determine if they are team1 or team2
+                // we have match index in curr round, as well as total number of matches in current round
+                const matchIndexInRound = i+1
+                const totalMatchesInNextRound = numMatches/2
+                const team1Or2 = (matchIndexInRound/totalMatchesInNextRound - Math.floor(matchIndexInRound/totalMatchesInNextRound) > 0.5) ? "team1_id" : "team2_id"
+
+                if (hasBye) {
+                    const byeMatch = await pool.query(
+                        `UPDATE matches SET ${team1Or2} = $1 WHERE match_id = $2 RETURNING *`,
+                        [match.team1_id, match.next_match_id]
+                    )
+                }
             }
             matches.push(currRoundMatches)
         }
