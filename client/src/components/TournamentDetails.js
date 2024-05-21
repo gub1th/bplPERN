@@ -68,6 +68,7 @@ const TournamentDetails = () => {
 
     async function addBracketLogic() {
         try {
+            console.log("adding bracket start")
             const response = await fetch(`http://localhost:4000/brackets`, {
                 method: "POST",
                 headers: { token: localStorage.token, 'Content-Type': 'application/json' },
@@ -88,11 +89,6 @@ const TournamentDetails = () => {
                 parseRes2 = await response2.json()
             }
             console.log(parseRes)
-
-            if (!parseRes || !parseRes2) {
-                window.alert("Something went wrong")
-                return
-            }
 
             navigate(`/brackets/${parseRes.bracket_id}?mode=init`);
 

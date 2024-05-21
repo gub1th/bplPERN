@@ -81,6 +81,15 @@ CREATE TABLE match_sets (
     UNIQUE (match_id, set_number)  -- Ensures each set number is unique within a match
 );
 
+CREATE TABLE player_scores (
+    score_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    set_id uuid NOT NULL,
+    profile_id uuid NOT NULL,
+    score INT,
+    FOREIGN KEY (set_id) REFERENCES match_sets(set_id),
+    FOREIGN KEY (profile_id) REFERENCES profiles(profile_id)
+)
+
 -- -- Brackets Table
 CREATE TABLE brackets (
     bracket_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),

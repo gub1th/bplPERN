@@ -7,6 +7,7 @@ const MatchDetails = () => {
 
     const [match, setMatch] = useState(null)
     const [matchTeams, setMatchTeams] = useState(null)
+    const [matchPlayers, setMatchPlayers] = useState(null)
     const [matchFormData, setMatchFormData] = useState({
         date: null,
         location: null,
@@ -136,6 +137,20 @@ const MatchDetails = () => {
         }
     }
 
+    async function fetchMatchPlayers() {
+        try {
+            const response = await fetch(`http://localhost:4000/matches/${matchId}/players`, {
+                method: "GET",
+                headers: { token: localStorage.token }
+            })
+            const parseRes = await response.json()
+            setMatchPlayers(parseRes)
+        } catch (err) {
+            console.log(err.message)
+            throw err;
+        }
+    }
+
     useEffect(() => {
         fetchMatch()
     }, [])
@@ -143,12 +158,13 @@ const MatchDetails = () => {
     useEffect(() => {
         fetchMatchSets()
         fetchMatchTeams()
+        fetchMatchPlayers()
     }, [match])
 
     return (
         <div>
             <h1>Match Details</h1>
-            {match && matchFormData && matchFormData.sets && matchTeams ? (
+            {match && matchFormData && matchFormData.sets && matchTeams && matchPlayers ? (
                 <div>
                     <form onSubmit={onSubmitForm}>
                         <label>
@@ -165,7 +181,7 @@ const MatchDetails = () => {
                         </label>
                         <label>
                             Home/Away
-                            <select name="homeTeamId" value={matchFormData.homeId} onChange={e => setMatchFormData({ ...matchFormData, homeId: e.target.value })}>
+                            <select name="homeTeamId" value={matchFormData.homeTeamId} onChange={e => setMatchFormData({ ...matchFormData, homeId: e.target.value })}>
                                 {matchTeams
                                     .map(team => 
                                         <option key={team.team_id} value={team.team_id}>

@@ -158,7 +158,7 @@ const BracketDetails = () => {
             const response = await fetch(`http://localhost:4000/brackets/${bracket.bracket_id}/finalize`, {
                 method: "POST",
                 headers: { token: localStorage.token, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ addedTeams })
+                body: JSON.stringify({ addedTeams, bracketName: inputs.bracket_name, bracketType: inputs.bracket_type })
             })
             console.log("finalize 3")
             const parseRes = await response.json()
@@ -352,7 +352,7 @@ const BracketDetails = () => {
                                                                     <tr className="tournament-bracket__team">
                                                                         <td className="tournament-bracket__country">
                                                                         <span className="tournament-bracket__code">
-                                                                            {bracketTeams.find(team => team.team_id === currMatch.team2_id)?.name}
+                                                                            {bracketTeams.find(team => team.team_id === currMatch.team2_id)?.name || "Bye"}
                                                                         </span>
                                                                         </td>
                                                                         <td className="tournament-bracket__score">
