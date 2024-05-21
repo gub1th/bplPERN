@@ -168,8 +168,13 @@ router.post("/:bracketId/finalize", async (req, res) => {
     try {
         console.log("finalize starting")
         const bracketId = req.params.bracketId;
-        const { addedTeams } = req.body;
+        const { addedTeams, bracketName, bracketType } = req.body;
         console.log(bracketId, addedTeams)
+
+        // update the bracket name and bracket type
+        const { rows } = await pool.query("UPDATE brackets SET name = $1, bracket_type = $2 WHERE bracket_id = $3 RETURNING *", [bracketName, bracketType, bracketId])
+        console.log(rows)
+
         // randomize the order
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
